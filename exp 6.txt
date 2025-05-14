@@ -1,0 +1,59 @@
+from collections import deque
+
+def vacuum_cleaner_bfs():
+    # Start state: Vacuum at A, both rooms dirty
+    start_state = ('A', 'Dirty', 'Dirty')
+    goal_state = ('A', 'Clean', 'Clean')  # or ('B', 'Clean', 'Clean')
+
+    # Queue holds (state, path)
+    queue = deque()
+    visited = set()
+
+    queue.append((start_state, []))
+
+    while queue:
+        current_state, path = queue.popleft()
+
+        if current_state in visited:
+            continue
+        visited.add(current_state)
+
+        location, A_status, B_status = current_state
+        new_path = path + [current_state]
+
+        if A_status == 'Clean' and B_status == 'Clean':
+            print("Goal reached! Steps:")
+            for step in new_path:
+                print(f"Vacuum at {step[0]}, A: {step[1]}, B: {step[2]}")
+            return
+
+        # Possible actions
+        actions = []
+
+        if location == 'A':
+            # Clean if dirty
+            if A_status == 'Dirty':
+                actions.append(('A', 'Clean', B_status))
+            # Move to B
+            actions.append(('B', A_status, B_status))
+        else:  # location == 'B'
+            if B_status == 'Dirty':
+                actions.append(('B', A_status, 'Clean'))
+            actions.append(('A', A_status, B_status))
+
+        for next_state in actions:
+            if next_state not in visited:
+                queue.append((next_state, new_path))
+
+    print("No solution found.")
+
+# Run the agent
+vacuum_cleaner_bfs()
+
+
+OUTPUT:
+Goal reached! Steps:
+Vacuum at A, A: Dirty, B: Dirty
+Vacuum at A, A: Clean, B: Dirty
+Vacuum at B, A: Clean, B: Dirty
+Vacuum at B, A: Clean, B: Clean
