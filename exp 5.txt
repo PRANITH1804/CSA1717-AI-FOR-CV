@@ -1,0 +1,68 @@
+from collections import deque
+
+def is_valid(m, c):
+    return (m == 0 or m >= c) and (3 - m == 0 or 3 - m >= 3 - c)
+
+def get_successors(state):
+    m, c, b = state
+    moves = [(1,0), (2,0), (0,1), (0,2), (1,1)]
+    successors = []
+
+    for dm, dc in moves:
+        if b == 1:  # boat on left side
+            new_m, new_c, new_b = m - dm, c - dc, 0
+        else:       # boat on right side
+            new_m, new_c, new_b = m + dm, c + dc, 1
+
+        if 0 <= new_m <= 3 and 0 <= new_c <= 3 and is_valid(new_m, new_c):
+            successors.append((new_m, new_c, new_b))
+    return successors
+
+def missionaries_cannibals():
+    start = (3, 3, 1)
+    goal = (0, 0, 0)
+    visited = set()
+    queue = deque([(start, [])])
+
+    while queue:
+        current, path = queue.popleft()
+
+        if current in visited:
+            continue
+        visited.add(current)
+
+        new_path = path + [current]
+
+        if current == goal:
+            print("Solution path:")
+            for step in new_path:
+                print(f"Left bank -> M: {step[0]}, C: {step[1]} | Boat on {'Left' if step[2] else 'Right'}")
+            return
+
+        for neighbor in get_successors(current):
+            queue.append((neighbor, new_path))
+
+    print("No solution found.")
+
+# Run the solver
+missionaries_cannibals()
+
+
+
+
+OUTPUT:
+
+Solution path:
+Left bank -> M: 3, C: 3 | Boat on Left
+Left bank -> M: 3, C: 1 | Boat on Right
+Left bank -> M: 3, C: 2 | Boat on Left
+Left bank -> M: 3, C: 0 | Boat on Right
+Left bank -> M: 3, C: 1 | Boat on Left
+Left bank -> M: 1, C: 1 | Boat on Right
+Left bank -> M: 2, C: 2 | Boat on Left
+Left bank -> M: 0, C: 2 | Boat on Right
+Left bank -> M: 0, C: 3 | Boat on Left
+Left bank -> M: 0, C: 1 | Boat on Right
+Left bank -> M: 1, C: 1 | Boat on Left
+Left bank -> M: 0, C: 0 | Boat on Right
+
